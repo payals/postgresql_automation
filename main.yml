@@ -1,0 +1,18 @@
+---
+- hosts: ec2
+  remote_user: ubuntu
+  sudo: true
+  vars:
+        max_connections: 110
+        temp_file_limit: 10
+  handlers:
+        - name: reload postgres config
+          sudo_user: postgres
+          shell: psql -c "select pg_reload_conf()"
+  tasks:
+        - name: update apt cache
+          apt: update_cache=yes
+        - include: tasks/postgresql.yml
+
+# roles:
+  #          - ANXS.postgresql
