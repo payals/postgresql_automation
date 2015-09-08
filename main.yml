@@ -1,5 +1,5 @@
 ---
-- hosts: ec2
+- hosts: db
   remote_user: ubuntu
   sudo: true
   vars:
@@ -12,7 +12,20 @@
   tasks:
         - name: update apt cache
           apt: update_cache=yes
-        - include: tasks/postgresql.yml
+          #        - include: tasks/postgresql.yml
 
-# roles:
-  #          - ANXS.postgresql
+- hosts: streaming-master
+  remote_user: ubuntu
+  sudo_user: root
+  sudo: true
+  #  vars_files:
+  #  - 'roles/pg_master/defaults/main.yml'
+  roles:
+    - pg_master
+
+- hosts: streaming-slaves
+  remote_user: ubuntu
+  sudo_user: root
+  sudo: true
+  roles:
+    - pg_slave
