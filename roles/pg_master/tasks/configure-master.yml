@@ -40,12 +40,13 @@
     mode: 0640
 
 - name: "Stage 2: configure postgresql.conf"
-  lineinfile:
+  template:
+    src: ../../../templates/postgresql.conf.j2
     dest: "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"
-    state: present
-    regexp: "{{ item.regexp }}"
-    line: "{{ item.guc }}"
-  with_items: postgresql_conf_default_guc
+    owner: "{{ postgresql_admin_user }}"
+    group: "{{ postgresql_admin_user }}"
+    mode: 0640
+    # state: present
 
 - name: "Stage 2: create postgresql log directory"
   file:

@@ -5,6 +5,7 @@
   vars:
         max_connections: 110
         temp_file_limit: 10
+        listen_addresses: '*'
   handlers:
         - name: reload postgres config
           sudo_user: postgres
@@ -18,8 +19,12 @@
   remote_user: ubuntu
   sudo_user: root
   sudo: true
-  #  vars_files:
-  #  - 'roles/pg_master/defaults/main.yml'
+  #  vars:
+  #      max_connections: 110
+  #      temp_file_limit: 10
+  #      listen_addresses: '*'
+  vars_files:
+    - 'defaults/main.yml'
   roles:
     - pg_master
 
@@ -27,5 +32,7 @@
   remote_user: ubuntu
   sudo_user: root
   sudo: true
+  vars_files:
+   - 'defaults/main.yml'
   roles:
     - pg_slave

@@ -55,9 +55,9 @@ postgresql_pg_hba_custom:
  - { type: host, database: replication, role: "{{ postgresql_admin_user }}", address: "127.0.0.1/32", method: "{{ postgresql_default_ipv4_auth_method }}", comment: '' }
 
 # PostgreSQL parameters which will appears in the postgresql.conf. Be aware, some parameters from newer postgresql versions, does not supported in the elder postrgesql versions, and may lead to the case when postgresql service does not start
-#postgresql_conf_default_guc:
-#  - { regexp: "^#?listen_addresses = .*$", guc: "listen_addresses = '*'" }
-#  - { regexp: "^#?wal_level = .*$", guc: "wal_level = {{'hot_standby'}}" }
-#  - { regexp: "^#?max_wal_senders = .*$", guc: "max_wal_senders = {{ 6 }}" }
-#  - { regexp: "^#?wal_keep_segments = .*$", guc: "wal_keep_segments = {{ 256 }}" }
-#  - { regexp: "^#?hot_standby = .*$", guc: "hot_standby = {{ 'on' }}" }
+postgresql_conf_default_guc:
+  - { regexp: "^#?listen_addresses = .*$", guc: "listen_addresses = '*'" }
+  - { regexp: "^#?wal_level = .*$", guc: "wal_level = {{'hot_standby'}}" }
+  - { regexp: "^#?max_wal_senders = .*$", guc: "max_wal_senders = {{ 6 }}" }
+  - { regexp: "^#?wal_keep_segments = .*$", guc: "wal_keep_segments = {{ 256 }}" }
+  - { regexp: "^#?hot_standby = .*$", guc: "hot_standby = {{ 'on' }}" }
