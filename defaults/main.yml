@@ -6,7 +6,21 @@ max_wal_senders: 6
 wal_keep_segments: 256
 hot_stanby: 'on'
 
+# Restart cluster
+restart_master: no 
+restart_slave: no
 
-# Bollean variable to indicate if there's been a failover. Slave is rebuilt if it is set to true
+# Boolean variable to indicate if there's been a failover. Slave is rebuilt if it is set to true
 
-failover: True
+promote_slave: False
+slave_rebuild: True
+
+# Boolean variable to indicate whether cluster needs to be setup from scratch
+
+install: True
+
+uninstall_binaries_and_data: yes
+
+# Extensions to install
+
+postgresql_contrib: yes

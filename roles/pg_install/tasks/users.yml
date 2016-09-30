@@ -10,7 +10,11 @@
   with_items: postgresql_users
   when: postgresql_users|length > 0
 
-- name: "Stage 3. add postgresql replication roles"
+#- name: "Stage 3. add postgresql replication roles"
+#  shell: "psql -U postgres -c \"create role '{{ postgresql_streaming_user.name }}' with replication password '{{ postgresql_streaming_user.pass  }}' login \""
+#  when: postgresql_streaming_user|length > 0
+
+- name: "Create replication user"
   postgresql_user:
     state: present
     name: "{{ postgresql_streaming_user.name }}"

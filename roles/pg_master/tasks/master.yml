@@ -1,0 +1,28 @@
+# file: tasks/configure-master.yml -- postgresql pre-start configuration of master server and startup
+
+- name: "Stage 2: configure pg_hba.conf"
+  template:
+    src: pg_hba.conf.j2
+    dest: "{{ pgdata }}/pg_hba.conf"
+    owner: "{{ postgresql_admin_user }}"
+    group: "{{ postgresql_admin_user }}"
+    mode: 0640
+
+- name: "Stage 2: configure postgresql.conf"
+  template:
+    src: ../../../templates/postgresql.conf.j2
+    dest: "{{ pgdata }}/postgresql.conf"
+    owner: "{{ postgresql_admin_user }}"
+    group: "{{ postgresql_admin_user }}"
+    mode: 0640
+    # state: present
+
+- name: "Stage 2: start postgresql service"
+  service: name="postgresql" state=restarted enabled=yes
+  when: restart_master
+#  sudo_user: postgres
+#  shell: "pg_ctl -D {{ pgdata }} start"
+
+- name: "Reloading configuration files on master"
+  sudo_user: postgres
+  shell: psql -c "select pg_reload_conf()"

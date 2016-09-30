@@ -2,31 +2,43 @@
 - hosts: db
   remote_user: ubuntu
   sudo: true
-  vars:
-        max_connections: 110
-        temp_file_limit: 10
-        listen_addresses: '*'
+#  vars:
+#        max_connections: 110
+#        temp_file_limit: 10
+#        listen_addresses: '*'
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/usr/lib/postgresql/9.6/bin"
+  vars_files:
+    - 'defaults/main.yml'
   handlers:
         - name: reload postgres config
           sudo_user: postgres
           shell: psql -c "select pg_reload_conf()"
-  tasks:
-        - name: update apt cache
-          apt: update_cache=yes
-          #        - include: tasks/postgresql.yml
+#  tasks:
+#        - name: update apt cache
+#          apt: update_cache=yes
+  roles:
+    - {role: pg_install, when: "install == True"}
 
 - hosts: streaming-master
-  remote_user: ubuntu
+#  sudo_user: ubuntu
   sudo_user: root
   sudo: true
+#  tasks:
+#	- name: tetsing
+#	  apt: update_cache=yes
   #  vars:
   #      max_connections: 110
   #      temp_file_limit: 10
   #      listen_addresses: '*'
   vars_files:
     - 'defaults/main.yml'
+    - 'roles/pg_install/defaults/main.yml'
   roles:
+#    - {role: pg_install, when: "install == True"}
+#    - {role: pg_master, when: "install == False"}
     - pg_master
+    - {role: promote_slave, when: "promote_slave == True"}
 
 - hosts: streaming-slaves
   remote_user: ubuntu
@@ -34,6 +46,8 @@
   sudo: true
   vars_files:
    - 'defaults/main.yml'
+   - 'roles/pg_install/defaults/main.yml'
   roles:
-    - {role: slave_rebuild, when: "failover == True"}
-    - {role: pg_slave, when: "failover == False"}
+    - {role: slave_rebuild, when: "slave_rebuild == True"}
+    - pg_slave
+#    - {role: pg_slave, when: "failover == False"}

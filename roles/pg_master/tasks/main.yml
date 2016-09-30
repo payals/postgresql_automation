@@ -1,8 +1,4 @@
 ---
 # tasks file for pg_master
 
-- include: configure-master.yml
-
-- include: users.yml
-
-- include: databases.yml
+- include: master.yml

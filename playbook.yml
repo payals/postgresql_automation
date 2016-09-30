@@ -7,7 +7,7 @@
         temp_file_limit: 10
   handlers:
         - name: reload postgres config
-          sudo_user: postgres
+          become_user: postgres
           shell: psql -c "select pg_reload_conf()"
   tasks:
         - include: tasks/postgresql.yml

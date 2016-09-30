@@ -1,2 +1,14 @@
 ---
-# tasks file for pg_install
+# tasks file for pg_master
+
+- copy: src=../files/pg_install_source.sh dest=/home/ubuntu/pg_install_source.sh owner=ubuntu mode=0744
+
+- copy: src=../files/rum_install.sh dest=/home/ubuntu/rum_install.sh owner=ubuntu mode=0744
+
+- include: install.yml
+
+- include: configure-master.yml
+
+- include: users.yml
+
+#- include: databases.yml
