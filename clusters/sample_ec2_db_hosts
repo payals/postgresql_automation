@@ -1,0 +1,9 @@
+[db]
+10.0.77.100
+10.0.77.101
+
+[streaming-master]
+master ansible_ssh_host=10.0.77.100
+
+[streaming-slaves]
+slave ansible_ssh_host=10.0.77.101
