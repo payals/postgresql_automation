@@ -1,0 +1,23 @@
+---
+# defaults file for backups
+
+setup: False
+
+# Upload or download
+only_upload_backup: False
+only_download_backup: False
+
+# Date of the backup to be restored FORMAT: yyyymmdd (old) or yyyy-mm-dd (new)
+
+restore: False
+restore_from_date: "2016-10-14"
+
+# Today's date for backup
+
+backup: False
+db_name: "db1"
+today: "{{ ansible_date_time.date }}"
+
+# Local backup directory - this is the location where backups will be stored before uploading to s3 and also where backups from s3 will be downloaded
+
+backup_dir: "/home/ubuntu"

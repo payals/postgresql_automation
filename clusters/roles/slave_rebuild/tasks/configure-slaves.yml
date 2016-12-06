@@ -1,0 +1,109 @@
+# file: tasks/configure-slaves.yml -- postgresql pre-start configuration of the slave servers and startup
+
+#- name: "Reload configuration files"
+#  sudo_user: postgres
+#  shell: psql -c "select pg_reload_conf()"
+
+#- name: "Stage 3: stop old postgresql service"
+##  service: name="postgresql" state=stopped
+#  sudo_user: postgres
+#  shell: psql -c "pg_ctl -D {{ pgdata }} stop"
+#  when: postgresql_drop_old_cluster
+
+#- name: "Stage 3: remove old postgresql cluster"
+#  command: "rm -rf {{ pgdata }} {{ postgresql_cluster_symlink_src }}"
+#  when: postgresql_drop_old_cluster
+
+#- name: "Stage 3: cluster directory replacement with symlink, check destination directory"
+#  file:
+#    path: "{{ postgresql_cluster_symlink_src }}"
+#    state: directory
+#    owner: "{{ postgresql_admin_user }}"
+#    group: "{{ postgresql_admin_user }}"
+#    mode: 0700
+#  when: postgresql_cluster_symlink_src|length > 0
+  
+#- name: "Stage 3: cluster directory replacement with symlink, create symlink"
+#  file:
+#    src: "{{ postgresql_cluster_symlink_src }}"
+#    dest: "/var/lib/postgresql/{{ postgresql_version }}/main"
+#    state: link
+#    owner: "{{ postgresql_admin_user }}"
+#    group: "{{ postgresql_admin_user }}"
+#  when: postgresql_cluster_symlink_src|length > 0
+
+- name: "Stage 1: write .pgpass for postgres user"
+  shell: "echo '*:*:*:{{ postgresql_streaming_user.name }}:{{ postgresql_streaming_user.pass }}' > ~postgres/.pgpass"
+
+- name: "Stage 2: change permissions on .pgpass"
+  file:
+    path: ~postgres/.pgpass
+    state: file
+    owner: "{{ postgresql_admin_user }}"
+    group: "{{ postgresql_admin_user }}"
+    mode: 0600
+
+- name: "Stage 3: stop postgres"
+  service: name="postgresql" state=stopped enabled=yes
+
+- name: "Stage 3: dropping slave data directory"
+  shell: "sudo rm -rf {{ pgdata }}"
+
+- name: "Stage 4: create new data directory"
+  file:
+    path: "{{ pgdata }}"
+    state: directory
+    owner: "{{ postgresql_admin_user }}"
+    group: "{{ postgresql_admin_user }}"
+    mode: 0700
+#  shell: "sudo mkdir -p {{ pgdata }}"
+
+#- name: "Stage 5: directory owner"
+#  shell: "sudo chown -R postgres:postgres {{ pgdata }}"
+
+#- name: "Stage 6: directory permissions"
+
+- name: "Stage 6: rebuild data directory from new master"
+  command: "sudo -u postgres pg_basebackup -c fast -X stream -h {{ postgresql_streaming_master }} -U {{ postgresql_streaming_user.name }} -D {{ pgdata }}"
+
+#- name: "Stage 7: configure pg_hba.conf"
+#  template:
+#    src: pg_hba.conf.j2
+#    dest: "{{ config_dir }}/pg_hba.conf"
+#    owner: "{{ postgresql_admin_user }}"
+#    group: "{{ postgresql_admin_user }}"
+#    mode: 0640
+
+#- name: "Stage 3: configure postgresql.conf"
+#  lineinfile:
+#    dest: "{{ config_dir }}/postgresql.conf"
+#    state: present
+#    regexp: "{{ item.regexp }}"
+#    line: "{{ item.guc }}"
+#  with_items: postgresql_conf_default_guc
+
+- name: "Stage 7: configure recovery.conf"
+  template:
+    src: recovery.conf.j2
+    dest: "{{ pgdata }}/recovery.conf"
+    owner: "{{ postgresql_admin_user }}"
+    group: "{{ postgresql_admin_user }}"
+    mode: 0640
+
+- name: "Stage 8: create postgresql log directory"
+  file:
+    path: "{{ postgresql_log_directory }}"
+    state: directory
+    owner: "{{ postgresql_admin_user }}"
+    group: "{{ postgresql_admin_user }}"
+    mode: 0755
+  when: postgresql_log_directory is defined
+
+- name: "Stage 3: start postgresql service"
+  service: name="postgresql" state=started enabled=yes
+
+#  sudo_user: postgres
+#  shell: "pg_ctl -D {{ pgdata }} start"
+
+#- name: "Install python-psycopg2"
+#  apt: name=python-psycopg2 state=present

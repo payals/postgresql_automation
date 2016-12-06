@@ -1,0 +1,10 @@
+---
+# Install dependencies
+
+- name: Install packages needed to interact with S3
+  apt: name={{ item }} state=present
+  with_items:
+    - python-boto
+    - python-pip
+    - awscli
+  become: true

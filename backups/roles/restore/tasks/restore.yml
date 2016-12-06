@@ -1,0 +1,22 @@
+---
+
+- name: check if backup file is already downloaded
+  stat: path={{ backup_dir }}/{{ db_name }}_{{ restore_from_date }}.bak
+  register: backup_file
+
+- debug: msg="stat finished, going to next section"
+
+- name: download backup file
+  s3: region="ap-southeast-1" bucket="woi-backup-storage" object="/DB_publishing/{{ db_name }}_{{ restore_from_date }}.bak" dest={{ backup_dir }}/{{ db_name }}_{{ restore_from_date }}.bak mode=get
+  when: backup_file.stat.exists == False or only_download_backup or restore
+
+- debug: msg="checked condition"
+
+- file: path={{ backup_dir }}/restore.log state=touch mode=0666
+# Task to restore a backup
+
+- name: restore from given backup
+  shell: "pg_restore -C -U postgres -d postgres {{ db_name }}_{{ restore_from_date }}.bak > restore.log 2>&1"
+  args:
+    chdir: "{{ backup_dir }}"
+  when: not only_download_backup

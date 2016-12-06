@@ -1,0 +1,32 @@
+# postgresql.conf common settings
+
+listen_addresses: '*'
+wal_level: 'replica'
+archive_mode: 'on'
+archive_command: 'envdir /etc/wal-e.d/env /usr/local/bin/wal-e wal-push %p'
+archive_timeout: 60
+max_wal_senders: 6
+wal_keep_segments: 256
+hot_standby: 'on'
+max_replication_slots: 10
+log_destination: 'syslog'
+logging_collector: 'on'
+log_min_duration_statement: 100
+
+# Restart cluster
+restart_master: no
+restart_slave: no
+# Boolean variable to indicate if there's been a failover. Slave is rebuilt if it is set to true
+
+promote_slave: False
+slave_rebuild: False
+
+# Boolean variable to indicate whether cluster needs to be setup from scratch
+
+install: False
+
+uninstall_binaries_and_data: yes
+
+# Extensions to install
+
+postgresql_contrib: yes

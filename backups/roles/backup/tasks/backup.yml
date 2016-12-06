@@ -1,0 +1,12 @@
+---
+
+# Task to take a database backup
+
+- name: "Use pg_dump for logical backup"
+  shell: "pg_dump -U postgres -Fc -f {{ db_name }}_{{ today }}.bak {{ db_name }} > backup.log 2>&1"
+  args:
+    chdir: "{{ backup_dir }}"
+  when: not only_upload_backup
+
+- name: "upload backup file"
+  s3: region="ap-southeast-1" bucket="woi-backup-storage" object="/DB_publishing/{{ db_name }}_{{ today }}.bak" src="{{ backup_dir }}/{{ db_name }}_{{ today }}.bak" mode=put

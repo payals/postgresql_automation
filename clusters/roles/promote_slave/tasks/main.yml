@@ -1,0 +1,6 @@
+---
+# tasks file for promote_slave
+
+- name: "Promoting slave"
+  sudo_user: postgres
+  shell: "pg_ctl -D {{ pgdata }} promote"

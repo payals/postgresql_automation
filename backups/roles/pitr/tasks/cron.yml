@@ -1,0 +1,5 @@
+---
+# Cronjob for taking daily base backups
+
+- name: "Create daily base backup cronjob for continuous archiving and PITR"
+  cron: minute="20" hour="5" name="Daily database base backup" user="postgres" job="/usr/bin/envdir /etc/wal-e.d/env /usr/local/bin/wal-e backup-push {{ pgdata }}"

@@ -1,0 +1,4 @@
+---
+# tasks file for s3
+
+- include: install.yml

@@ -1,0 +1,59 @@
+--- 
+
+- copy: "src='pgdg.list' dest='/etc/apt/sources.list.d/pgdg.list' owner=root group=root mode=0644"
+  name: "Add source list"
+ 
+- name: add source list key
+  apt_key: keyserver=keyserver.ubuntu.com id=7FCC7D46ACCC4CF8 state=present
+
+- name: update apt cache
+  apt: update_cache=yes
+
+- name: stop postgresql if already running
+  service: "name=postgresql state=stopped"
+
+- name: uninstall current package if preset
+  apt: name={{item}} state=absent purge=yes
+  with_items:
+    - postgresql-contrib-{{ postgresql_version }}
+    - postgresql-server-dev-{{ postgresql_version }}
+    - postgresql-common
+    - postgresql-client-common
+    - postgresql-9.6
+    - postgresql-client-{{ postgresql_version }}
+  when: uninstall_binaries_and_data
+
+#- name: only uninstall binaries
+#  apt: "name=postgresql-contrib-9.6 state=absent"
+#  when: not uninstall-binaries-and-data
+
+- name: only uninstall binaries
+  apt: "name=postgresql-contrib-9.6 state=absent"
+  when: not uninstall_binaries_and_data
+
+- name: Install postgresql
+  apt: name={{item}} state=present
+  with_items:
+    - postgresql-contrib-{{ postgresql_version }}
+    - postgresql-server-dev-{{ postgresql_version }}
+    - make
+    - gcc
+  when: postgresql_contrib
+
+- name: Create symlinks for postgres binaries
+  file: "src=/usr/lib/postgresql/9.6/bin/{{ item.src }} dest=/usr/bin/{{ item.dest }} state=link"
+  with_items:
+    - { src: "pg_ctl", dest: "pg_ctl" }
+    - { src: "psql", dest: "psql" }
+    - { src: "initdb", dest: "initdb" }
+
+#- apt: "name=postgresql-contrib-{{ postgresql_version }} state=present"
+#  name: "Install postgres with contrib"
+#  when: postgresql-contrib
+
+- name: start postgresql if not already running
+  service: "name=postgresql state=started"
+
+- name: "Install RUM Extension"
+  shell: "sh /home/ubuntu/rum_install.sh"
+  when: uninstall_binaries_and_data
