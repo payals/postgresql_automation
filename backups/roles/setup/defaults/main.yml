@@ -1,0 +1,13 @@
+---
+# defaults file for s3
+
+access_key: ""
+secret_key: ""
+
+s3_url: ""
+
+s3_bucket: "DB"
+
+put_from: "{{ backup_dir }}"
+
+get_to: "{{ backup_dir }}"
