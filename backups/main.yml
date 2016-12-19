@@ -1,0 +1,16 @@
+---
+
+- hosts: master
+  become: true
+  vars_files:
+    - 'defaults/main.yml'
+    - 'defaults/s3.yml'
+    - 'defaults/pitr.yml'
+  environment:
+    AWS_ACCESS_KEY_ID: ""
+    AWS_SECRET_KEY: ""
+  roles:
+    - { role: setup, when: "setup == True" } 
+    - { role: restore, when: "restore == True or only_download_backup == True"}
+    - { role: backup, when: "backup == True or only_upload_backup == True"}
+    - { role: pitr, when: "setup_pitr == True" }
