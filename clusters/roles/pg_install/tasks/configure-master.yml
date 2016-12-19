@@ -1,0 +1,52 @@
+# file: tasks/configure-master.yml -- postgresql pre-start configuration of master server and startup
+
+- name: "Stage 2: configure pg_hba.conf"
+  template:
+    src: pg_hba.conf.j2
+    dest: "{{ config_dir }}/pg_hba.conf"
+    owner: "{{ postgresql_admin_user }}"
+    group: "{{ postgresql_admin_user }}"
+#    mode: 0640
+
+- name: "Stage 2: postgresql.conf permissions"
+  template:
+    src: ../../../templates/postgresql.conf.j2
+    dest: "{{ config_dir }}/postgresql.conf"
+    owner: "{{ postgresql_admin_user }}"
+    group: "{{ postgresql_admin_user }}"
+#    mode: 0640
+    # state: present
+
+- name: "Stage 2: create postgresql log directory"
+  file:
+    path: "{{ postgresql_log_directory }}"
+    state: directory
+    owner: "{{ postgresql_admin_user }}"
+    group: "{{ postgresql_admin_user }}"
+    mode: 0755
+  when: postgresql_log_directory is defined
+
+- name: Create folder postgresql configuration in /mnt
+  file: path=/mnt/postgresql/{{ postgresql_version }} state=directory owner=postgres group=postgres mode=0755 recurse=yes
+  become: yes
+
+- name: Delete postgresql data at /mnt
+  file: path=/mnt/postgresql/{{ postgresql_version }}/main state=absent
+  become: yes
+  when: uninstall_binaries_and_data
+
+- name: Move postgresql data to /mnt
+  command: mv /var/lib/postgresql/{{ postgresql_version }}/main /mnt/postgresql/{{ postgresql_version }}/main
+  become: yes
+  when: uninstall_binaries_and_data
+
+- name: "Stage 2: restart postgresql service"
+  service: name="postgresql" state=restarted enabled=yes
+#  when: restart_master
+
+- name: "Install python-psycopg2"
+  apt: name=python-psycopg2 state=present
+
+#- name: "Reloading postgres configuration file after install"
+#  sudo_user: postgres
+#  shell: psql -c "select pg_reload_conf()"

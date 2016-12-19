@@ -1,0 +1,4 @@
+---
+# Tasks file for pg_slave
+
+- include: configure-slaves.yml

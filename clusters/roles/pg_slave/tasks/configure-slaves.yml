@@ -1,0 +1,32 @@
+# file: tasks/configure-slaves.yml -- postgresql pre-start configuration of the slave servers and startup
+
+- name: "Stage 2: configure pg_hba.conf"
+  template:
+    src: pg_hba.conf.j2
+    dest: "{{ config_dir }}/pg_hba.conf"
+    owner: "{{ postgresql_admin_user }}"
+    group: "{{ postgresql_admin_user }}"
+#    mode: 0640
+
+- name: "Stage 2: postgresql.conf permissions"
+  template:
+    src: ../../../templates/postgresql.conf.j2
+    dest: "{{ config_dir }}/postgresql.conf"
+    owner: "{{ postgresql_admin_user }}"
+    group: "{{ postgresql_admin_user }}"
+    #mode: 0640
+    #state: present
+
+- name: "Stage 3: start postgresql service"
+  service: name="postgresql" state=started enabled=yes
+
+- name: "Stage 2: restart postgresql service"
+  service: name="postgresql" state=restarted enabled=yes
+  when: restart_slave
+
+- name: "Install python-psycopg2"
+  apt: name=python-psycopg2 state=present
+
+- name: "Reloading postgres configuration file for slave"
+  sudo_user: postgres
+  shell: psql -c "select pg_reload_conf()"

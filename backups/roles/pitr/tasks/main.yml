@@ -1,0 +1,8 @@
+---
+# tasks file for pitr
+
+- include: install.yml
+
+- include: config.yml
+
+- include: cron.yml

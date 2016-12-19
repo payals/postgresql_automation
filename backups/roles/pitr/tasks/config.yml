@@ -1,0 +1,23 @@
+---
+# Configuration parameters for PITR
+
+- name: "Create env directory for wal-e"
+  file: path=/etc/wal-e.d/env state=directory recurse=yes mode=750 owner=root group=postgres
+
+- name: "Create secret key file"
+  file: path=/etc/wal-e.d/env/AWS_SECRET_ACCESS_KEY state=touch mode=750 owner=root group=postgres
+
+- name: "Create public key file"
+  file: path=/etc/wal-e.d/env/AWS_ACCESS_KEY_ID state=touch mode=750 owner=root group=postgres
+
+- name: "Create S3 bucket file"
+  file: path=/etc/wal-e.d/env/WALE_S3_PREFIX state=touch mode=750 owner=root group=postgres
+
+- name: "Put secret key in secret key file"
+  copy: content="{{ secret_key }}" dest=/etc/wal-e.d/env/AWS_SECRET_ACCESS_KEY
+
+- name: "Put key id in key id file"
+  copy: content="{{ access_key }}" dest=/etc/wal-e.d/env/AWS_ACCESS_KEY_ID
+
+- name: "Put s3 link in link file"
+  copy: content="{{ s3_url }}/{{ s3_bucket }}" dest=/etc/wal-e.d/env/WALE_S3_PREFIX

@@ -1,0 +1,11 @@
+---
+- name: install postgresql
+  apt: name=postgresql state=present
+- name: ensure service is online
+  service: name=postgresql state=started
+- name: copy customized postgresql.conf file
+  template:
+        src: templates/postgresql.conf.j2
+        dest: /etc/postgresql/9.3/main/postgresql.conf
+  notify:
+        - reload postgres config

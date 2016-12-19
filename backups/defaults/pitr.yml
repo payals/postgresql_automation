@@ -1,0 +1,8 @@
+---
+# Variables for PITR
+
+setup_pitr: False
+
+postgresql_version: 9.6
+
+pgdata: "/mnt/postgresql/{{ postgresql_version }}/main"
