@@ -1,0 +1,14 @@
+---
+
+# Variables and credentials for S3 access
+
+access_key: ""
+secret_key: ""
+
+s3_url: ""
+
+s3_bucket: ""
+
+put_from: "{{ backup_dir }}"
+
+get_to: "{{ backup_dir }}"
