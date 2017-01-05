@@ -1,6 +1,6 @@
 # Introduction
 
-The clusters playbook is design to install a master-slave postgres cluster and manage replication, maintenance and failover.
+The clusters playbook is designed to install a master-slave postgres cluster and manage replication, maintenance and failover.
 
 # Roles
 
