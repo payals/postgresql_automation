@@ -76,6 +76,6 @@ To perform a failover:
 
 - Set the failover flag in the defaults file to true: ` promote_slave: True `
 
-- also set the rebuild_slave flag to true if you want the old master to be rebuild as slave. **Pg_reqind support coming soon** ` slave_rebuild: True `
+- also set the rebuild_slave flag to true if you want the old master to be rebuild as slave. **Pg_rewind support coming soon** ` slave_rebuild: True `
 
 - Run the playbook ` ansible-playbook main.yml `
